@@ -61,13 +61,19 @@ ws.on("message", function incoming(Data) {
     session = data.d.session_id;
     console.log("Client Ready");
   }
-  if (data.t === "MESSAGE_CREATE" || data.t === "MESSAGE_UPDATE") {
-    if (data.d.author.id !== config.id) return;
 
-    if (filter.isProfane(data.d.content) || data.d.content.match(util.regex))
-      config.delete
-        ? util.del(data.d.channel_id, data.d.id)
-        : util.edit(data.d.content, data.d.channel_id, data.d.id);
+  if (data.t === "MESSAGE_CREATE" || data.t === "MESSAGE_UPDATE") {
+    try {
+      if (data.d.embeds.length > 0) return;
+      if (data.d.embeds) if (data.d.author.id !== config.id) return;
+
+      if (filter.isProfane(data.d.content) || data.d.content.match(util.regex))
+        config.delete
+          ? util.del(data.d.channel_id, data.d.id)
+          : util.edit(data.d.content, data.d.channel_id, data.d.id);
+    } catch (e) {
+      console.log(e, data);
+    }
   }
 
   if (data.op === 7) util.reconnect(ws, session, seq);

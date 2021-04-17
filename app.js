@@ -8,21 +8,27 @@ const ipRegex = /^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]
 
 client.on("ready", () => {
   console.log(`logged in as ${client.user.tag}`);
+  client.user.setStatus("idle");
 });
 
 client.on("message", (message) => {
-  if (message.author.id !== client.user.id) return;
+  try {
+    if (message.author.id !== client.user.id) return;
 
-  if (filter.isProfane(message.content)) {
-    setTimeout(() => {
-      message.delete();
-    }, config.time * 1000);
-  }
+    if (filter.isProfane(message.content)) {
+      setTimeout(() => {
+        message.delete();
+      }, config.time * 1000);
+    }
 
-  if (message.content.match(ipRegex)) {
-    setTimeout(() => {
-      message.delete();
-    }, config.time * 1000);
+    if (message.content.match(ipRegex)) {
+      setTimeout(() => {
+        message.delete();
+      }, config.time * 1000);
+    }
+  } catch (e) {
+    console.log(e);
+    console.log(`Message Link: ${message.url}`);
   }
 });
 

@@ -1,7 +1,7 @@
 # discord-safebot
 Auto delete bad discord messages after a certain amount of time
 # installation
-run `npm i discord.js`
+run `npm i discord.js bad-words`
 
 go into the discord.js node module folder and then src/client/client.js
 

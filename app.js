@@ -8,7 +8,6 @@ const ipRegex = /^((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]
 
 client.on("ready", () => {
   console.log(`logged in as ${client.user.tag}`);
-  client.user.setStatus("idle");
 });
 
 client.on("message", (message) => {

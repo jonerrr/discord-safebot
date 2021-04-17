@@ -1,5 +1,5 @@
 {
-  "name": "discord-safebot",
+  "name": "discord-safe-bot",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -10,7 +10,8 @@
   "author": "joner",
   "license": "MIT",
   "dependencies": {
-    "bad-words": "^3.0.4",
-    "discord.js": "^12.5.3"
+    "@thisshu/bad-words": "^3.0.9",
+    "axios": "^0.21.1",
+    "ws": "^7.4.4"
   }
 }

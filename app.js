@@ -56,7 +56,7 @@ ws.on("open", function open() {
 ws.on("message", function incoming(Data) {
   const data = JSON.parse(Data);
   seq = data.s;
-  if (data.op === 11) console.log("ACK received");
+  if (data.op === 11) console.log("Heartbeat acknowledged");
 
   if (data.op === 10) {
     nextBeat = Date.now() + data.d.heartbeat_interval;
@@ -76,10 +76,24 @@ ws.on("message", function incoming(Data) {
 
   if (data.t === "MESSAGE_CREATE" || data.t === "MESSAGE_UPDATE") {
     try {
-      if (data.d.embeds.length > 0) return;
-      if (data.d.author.id !== config.id) return;
+      if (
+        (data.d.embeds.length > 0 && !data.d.content) ||
+        data.d.author.discriminator === "0000" ||
+        data.d.author.id !== config.id
+      )
+        return;
 
-      if (filter.isProfane(data.d.content) || data.d.content.match(util.regex))
+      if (data.d.content.match(util.url_regex)) {
+        util.save(
+          data.d.content.match(util.url_regex),
+          data.d.id,
+          data.d.channel_id
+        );
+      }
+      if (
+        filter.isProfane(data.d.content) ||
+        data.d.content.match(util.ip_regex)
+      )
         config.delete
           ? util.del(data.d.channel_id, data.d.id)
           : util.edit(data.d.content, data.d.channel_id, data.d.id);
@@ -88,9 +102,13 @@ ws.on("message", function incoming(Data) {
     }
   }
 
-  if (data.op === 7) util.reconnect(ws, session, seq);
+  if (data.op === 7) {
+    // I have not seen this happen yet
+    console.log("Disconnected, attempting to reconnect");
+    util.reconnect(ws, session, seq);
+  }
 });
 
 ws.on("close", function close() {
-  console.log("disconnected");
+  console.log("WebSocket Closed");
 });

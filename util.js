@@ -22,6 +22,7 @@ const beat = (ws, time, code) => {
         d: code,
       })
     );
+    console.log("Heartbeat sent");
   }, time);
 };
 

@@ -8,6 +8,8 @@ const ws = new WebSocket("wss://gateway.discord.gg/?encoding=json&v=8");
 
 let session;
 let seq;
+let nextBeat;
+let interval;
 
 ws.on("open", function open() {
   ws.send(
@@ -34,7 +36,7 @@ ws.on("open", function open() {
           client_event_source: null,
         },
         presence: {
-          status: "online",
+          status: "invisible",
           since: 0,
           activities: [],
           afk: false,
@@ -54,8 +56,18 @@ ws.on("open", function open() {
 ws.on("message", function incoming(Data) {
   const data = JSON.parse(Data);
   seq = data.s;
+  if (data.op === 11) console.log("ACK received");
 
-  if (data.op === 10) util.beat(ws, data.d.heartbeat_interval, data.s);
+  if (data.op === 10) {
+    nextBeat = Date.now() + data.d.heartbeat_interval;
+    interval = data.d.heartbeat_interval;
+    util.beat(ws, data.d.heartbeat_interval, data.s);
+  }
+
+  if (Date.now() >= nextBeat) {
+    util.beat(ws, 0, data.s);
+    nextBeat = Date.now() + interval;
+  }
 
   if (data.t === "READY") {
     session = data.d.session_id;
@@ -65,7 +77,7 @@ ws.on("message", function incoming(Data) {
   if (data.t === "MESSAGE_CREATE" || data.t === "MESSAGE_UPDATE") {
     try {
       if (data.d.embeds.length > 0) return;
-      if (data.d.embeds) if (data.d.author.id !== config.id) return;
+      if (data.d.author.id !== config.id) return;
 
       if (filter.isProfane(data.d.content) || data.d.content.match(util.regex))
         config.delete
@@ -77,4 +89,8 @@ ws.on("message", function incoming(Data) {
   }
 
   if (data.op === 7) util.reconnect(ws, session, seq);
+});
+
+ws.on("close", function close() {
+  console.log("disconnected");
 });

@@ -4,7 +4,7 @@ const filter = require("./filter");
 
 const WebSocket = require("ws");
 
-const ws = new WebSocket("wss://gateway.discord.gg/?encoding=json&v=8");
+let ws = new WebSocket("wss://gateway.discord.gg/?encoding=json&v=8");
 
 let session;
 let seq;
@@ -111,4 +111,5 @@ ws.on("message", function incoming(Data) {
 
 ws.on("close", function close() {
   console.log("WebSocket Closed");
+  ws = new WebSocket("wss://gateway.discord.gg/?encoding=json&v=8");
 });
